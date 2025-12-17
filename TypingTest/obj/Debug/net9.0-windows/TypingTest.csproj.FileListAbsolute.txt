@@ -69,3 +69,4 @@ D:\Универ\Course2\TypingTest\TypingTest\obj\Debug\net9.0-windows\MVVM\View
 D:\Универ\Course2\TypingTest\TypingTest\obj\Debug\net9.0-windows\TypingTest_Content.g.cs
 D:\Универ\Course2\TypingTest\TypingTest\bin\Debug\net9.0-windows\Resources\Text\Words_eng.txt
 D:\Универ\Course2\TypingTest\TypingTest\bin\Debug\net9.0-windows\Resources\Text\words_ukr.txt
+D:\Универ\Course2\TypingTest\TypingTest\obj\Debug\net9.0-windows\Resources\Styles\LigthStyle.baml

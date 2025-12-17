@@ -34,7 +34,7 @@ public partial class MainWindow : Window
 
         TextBlock text = new TextBlock
         {
-            Text = "Вы действительно хотите выйти?",
+            Text = "Ви дійсно хочете вийти?",
             TextAlignment = TextAlignment.Center,
             Margin = new Thickness(0, 0, 0, 15)
         };
@@ -47,7 +47,7 @@ public partial class MainWindow : Window
 
         Button yesButton = new Button
         {
-            Content = "Да",
+            Content = "Так",
             Width = 70,
             Margin = new Thickness(5, 0, 5, 0)
         };
@@ -60,7 +60,7 @@ public partial class MainWindow : Window
         // кнопка Нет
         Button noButton = new Button
         {
-            Content = "Нет",
+            Content = "Ні",
             Width = 70,
             Margin = new Thickness(5, 0, 5, 0)
         };

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,356 +10,351 @@ using TypingTest.MVVM.Model;
 
 namespace TypingTest.MVVM.ViewModel.MainWindowVM;
 
-public class TestViewModel:INotifyPropertyChanged
+public class TestViewModel : INotifyPropertyChanged
 {
-    private const int TEST_DURATION_SECONDS = 60; // Длительность теста: 60 секунд
-        private const int WORDS_COUNT = 50; // Количество слов для генерации в тесте
-        private DispatcherTimer _timer;
-        private string _textToType;
-        private string _userInput;
-        private int _remainingTime;
-        private double _wpm;
-        private double _accuracy;
-        private bool _isTestRunning;
-        private DateTime _startTime;
-        private List<string> _allAvailableWords; // Список всех слов из файла
-        private int _totalCorrectCharsAccumulated = 0;
-        private int _totalErrors = 0;
-        
-        
-        private List<string> _wordsList; // Список усіх слів для набору
-        private int _wordIndex;         // Індекс поточного слова
-        private string _currentWord;
-        
-        public string CurrentWord
-        {
-            get => _currentWord;
-            set { _currentWord = value; OnPropertyChanged(); }
-        }
-
-        public TestViewModel()
-        {
-            // Сначала загружаем словарь
-            LoadWordsFromFile();
-            // Затем инициализируем текст теста
-            InitializeTest();
-            
-            StartTestCommand = new RelayCommand(StartTest, CanStartTest);
-            
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += Timer_Tick;
-        }
-
-        // --- Новая логика: Загрузка слов и Генерация текста ---
-
-        private void LoadWordsFromFile()
-        {
-            // 1. Подготовка путей
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string lang = StatisticsManager.CurrentLanguage;
+    private const int TEST_DURATION_SECONDS = 60;
+    private const int WORDS_COUNT = 50;
+    private DispatcherTimer _timer;
+    private string _textToType;
+    private string _userInput;
+    private int _remainingTime;
+    private double _wpm;
+    private double _accuracy;
+    private bool _isTestRunning;
+    private DateTime _startTime;
+    private List<string> _allAvailableWords;
+    private int _totalCorrectCharsAccumulated = 0;
+    private int _totalErrors = 0;
+    public ObservableCollection<CharDisplayModel> CurrentWordChars { get; set; } = new();
+    private List<string> _wordsList;
+    private int _wordIndex;
+    private string _currentWord;
     
-            // ВАЖНО: убедись, что файлы называются именно так (маленькими буквами)
-            string fileName = lang == "ukr" ? "words_ukr.txt" : "words_eng.txt";
+    public ICommand StartTestCommand { get; }
 
-            // 2. Список мест, где программа будет искать файл
-            string path1 = Path.Combine(baseDir, "Resources", "Text", fileName);
-            string path2 = Path.Combine(baseDir, "Text", fileName);
-            string path3 = Path.Combine(baseDir, fileName);
+    private bool CanStartTest(object obj) => true;
+    public string TimeDisplay => $"{RemainingTime / 60:D2}:{RemainingTime % 60:D2}";
 
-            string foundPath = null;
+    public TestViewModel()
+    {
+        LoadWordsFromFile();
+        InitializeTest();
 
-            // 3. Проверка существования файла
-            if (File.Exists(path1)) foundPath = path1;
-            else if (File.Exists(path2)) foundPath = path2;
-            else if (File.Exists(path3)) foundPath = path3;
+        StartTestCommand = new RelayCommand(StartTest, CanStartTest);
 
-            // 4. Загрузка данных
-            if (foundPath != null)
-            {
-                try 
-                {
-                    _allAvailableWords = File.ReadAllLines(foundPath)
-                        .Where(s => !string.IsNullOrWhiteSpace(s))
-                        .Select(s => s.Trim().ToLower())
-                        .ToList();
-            
-                    System.Diagnostics.Debug.WriteLine($"Успешно загружен словарь: {foundPath}");
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show("Ошибка при чтении файла: " + ex.Message);
-                }
-            }
-            else
-            {
-                // Если не нашли — показываем окно, чтобы ты мог скопировать путь
-                System.Windows.MessageBox.Show(
-                    $"ФАЙЛ НЕ НАЙДЕН!\n\n" +
-                    $"Проверь название: {fileName}\n" +
-                    $"Я искал его здесь:\n{path1}\n\n" +
-                    $"Убедись, что в свойствах файла стоит 'Copy if newer'!", 
-                    "Ошибка загрузки", 
-                    System.Windows.MessageBoxButton.OK, 
-                    System.Windows.MessageBoxImage.Error);
-
-                // Заглушка, чтобы программа не вылетала
-                _allAvailableWords = new List<string> { "ошибка", "файл", "не", "найден" };
-            }
-        }
-
-        private string GenerateRandomText()
-        {
-            if (_allAvailableWords == null || _allAvailableWords.Count == 0)
-            {
-                return "Не удалось загрузить словарь.";
-            }
-
-            Random random = new Random();
-            List<string> testWords = new List<string>();
-
-            // Генерируем WORDS_COUNT случайных слов
-            for (int i = 0; i < WORDS_COUNT; i++)
-            {
-                int index = random.Next(_allAvailableWords.Count);
-                testWords.Add(_allAvailableWords[index]);
-            }
-
-            // Объединяем слова в одну строку, разделенную пробелами
-            return string.Join(" ", testWords);
-        }
-
-        // --- Обновленный метод инициализации ---
-
-        private void InitializeTest()
-        {
-            LoadWordsFromFile(); // Завантажуємо всі доступні слова (_allAvailableWords)
+        _timer = new DispatcherTimer();
+        _timer.Interval = TimeSpan.FromSeconds(1);
+        _timer.Tick += Timer_Tick;
+    }
     
-            // 1. Створюємо список слів для тесту
-            TextToType = GenerateRandomText(); // Цей метод генерує рядок слів
-            _wordsList = TextToType.Split(' ').ToList();
+    public event PropertyChangedEventHandler PropertyChanged;
 
-            // 2. Ініціалізуємо стан
-            _wordIndex = 0;
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
     
-            // 3. Встановлюємо перше слово
-            CurrentWord = _wordsList.Any() ? _wordsList[_wordIndex] : string.Empty;
-
-            // Скидання метрик
-            UserInput = string.Empty;
-            RemainingTime = TEST_DURATION_SECONDS;
-            WPM = 0;
-            Accuracy = 0;
-            IsTestRunning = false;
-        }
-
-        // --- Свойства и остальные методы остаются без изменений ---
-
-        public string TextToType
+    public string CurrentWord
+    {
+        get => _currentWord;
+        set
         {
-            get => _textToType;
-            set { _textToType = value; OnPropertyChanged(); }
+            _currentWord = value;
+            CurrentWordChars.Clear();
+            foreach (var c in _currentWord) 
+                CurrentWordChars.Add(new CharDisplayModel { CharValue = c });
+            OnPropertyChanged();
         }
-
-        public string UserInput
+    }
+    
+    public string TextToType
+    {
+        get => _textToType;
+        set
         {
-            get => _userInput;
-            set
+            _textToType = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string UserInput
+    {
+        get => _userInput;
+        set
+        {
+            if (value == null) return;
+
+            // 1. ЗАПРЕТ BACKSPACE
+            // Если новая длина меньше старой — значит нажали стирание. Блокируем.
+            if (_userInput != null && value.Length < _userInput.Length)
             {
-                // 1. Если тест не запущен и мы ввели первый символ — запускаем тест
-                if (!_isTestRunning && !string.IsNullOrEmpty(value) && RemainingTime > 0)
+                OnPropertyChanged();
+                return;
+            }
+
+            // 2. ОБРАБОТКА ПРОБЕЛА
+            if (value.EndsWith(" "))
+            {
+                if (value.Trim() == CurrentWord)
                 {
-                    StartTest();
+                    CheckWord(value.Trim());
+                    _userInput = string.Empty;
                 }
+                OnPropertyChanged();
+                return;
+            }
 
-                // 2. Если тест всё еще не запущен (например, время вышло) — блокируем ввод
-                if (!_isTestRunning) return;
+            // 3. БЛОКИРОВКА ЛИШНЕГО (если слово уже набрано полностью)
+            if (_userInput == CurrentWord)
+            {
+                OnPropertyChanged();
+                return;
+            }
 
-                // Логика пробела
-                if (value.EndsWith(" "))
+            // 4. АВТОСТАРТ ТАЙМЕРА
+            if (!_isTestRunning && !string.IsNullOrEmpty(value))
+            {
+                StartTimerOnly();
+            }
+
+            // 5. ПРОВЕРКА СИМВОЛА
+            if (value.Length > (_userInput?.Length ?? 0))
+            {
+                int index = value.Length - 1;
+                if (index < CurrentWord.Length)
                 {
-                    string typedWord = value.Trim();
-                    if (typedWord == CurrentWord)
+                    if (value[index] == CurrentWord[index])
                     {
-                        _totalCorrectCharsAccumulated += CurrentWord.Length + 1;
-                        MoveToNextWord();
-                        return;
-                    }
-                }
-
-                // Подсчет ошибок (сравнение с текущим вводом)
-                if (!string.IsNullOrEmpty(value) && (value.Length > (_userInput?.Length ?? 0)))
-                {
-                    int index = value.Length - 1;
-                    if (index < CurrentWord.Length)
-                    {
-                        if (value[index] != CurrentWord[index])
-                        {
-                            _totalErrors++; 
-                        }
+                        // Верно — красим в зеленый и пропускаем символ в _userInput
+                        CurrentWordChars[index].UnderlineColor = "#00FF00";
                     }
                     else
                     {
-                        _totalErrors++; 
+                        // ОШИБКА — красим в красный, считаем ошибку, но НЕ ПРИНИМАЕМ в _userInput
+                        CurrentWordChars[index].UnderlineColor = "#FF0000";
+                        _totalErrors++;
+                        CalculateMetrics();
+                        OnPropertyChanged(); // Чтобы текстбокс не принял неверную букву
+                        return; 
                     }
                 }
-
-                _userInput = value;
-                OnPropertyChanged();
-                CalculateMetrics();
             }
+
+            _userInput = value;
+            OnPropertyChanged();
+            CalculateMetrics();
         }
-        
-        private void MoveToNextWord()
-        {
-            // 1. Збільшуємо індекс
-            _wordIndex++;
+    }
     
-            // 2. Перевіряємо, чи є ще слова
-            if (_wordIndex < _wordsList.Count)
+    public int RemainingTime
+    {
+        get => _remainingTime;
+        set
+        {
+            _remainingTime = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TimeDisplay));
+        }
+    }
+    public double WPM
+    {
+        get => _wpm;
+        set
+        {
+            _wpm = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public double Accuracy
+    {
+        get => _accuracy;
+        set
+        {
+            _accuracy = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsTestRunning
+    {
+        get => _isTestRunning;
+        set
+        {
+            _isTestRunning = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private void LoadWordsFromFile()
+    {
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string lang = SettingsManager.Language;
+        string fileName = lang == "ukr" ? "words_ukr.txt" : "words_eng.txt";
+
+        string path1 = Path.Combine(baseDir, "Resources", "Text", fileName);
+        string path2 = Path.Combine(baseDir, "Text", fileName);
+        string path3 = Path.Combine(baseDir, fileName);
+
+        string foundPath = null;
+        if (File.Exists(path1)) foundPath = path1;
+        else if (File.Exists(path2)) foundPath = path2;
+        else if (File.Exists(path3)) foundPath = path3;
+
+        if (foundPath != null)
+        {
+            try
             {
-                // Встановлюємо нове слово
-                CurrentWord = _wordsList[_wordIndex];
-        
-                // *** КЛЮЧОВЕ ОЧИЩЕННЯ: ***
-                // Очищаємо _userInput
-                _userInput = string.Empty; 
-        
-                // Повідомляємо View, що властивість UserInput (поле введення) змінилася і має бути порожньою
-                OnPropertyChanged(nameof(UserInput)); 
+                _allAvailableWords = File.ReadAllLines(foundPath)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => s.Trim().ToLower())
+                    .ToList();
             }
-            else
+            catch (Exception ex)
             {
-                // Тест завершено
-                EndTest();
+                System.Windows.MessageBox.Show("Ошибка при чтении файла: " + ex.Message);
             }
         }
-
-        public int RemainingTime
+        else
         {
-            get => _remainingTime;
-            set { _remainingTime = value; OnPropertyChanged(); OnPropertyChanged(nameof(TimeDisplay)); }
+            _allAvailableWords = lang == "ukr"
+                ? new List<string> { "помилка", "файл", "відсутній" }
+                : new List<string> { "error", "no", "file" };
         }
-        
-        public string TimeDisplay => $"{RemainingTime / 60:D2}:{RemainingTime % 60:D2}";
+    }
 
-        public double WPM
+    private string GenerateRandomText()
+    {
+        if (_allAvailableWords == null || _allAvailableWords.Count == 0)
         {
-            get => _wpm;
-            set { _wpm = value; OnPropertyChanged(); }
-        }
-
-        public double Accuracy
-        {
-            get => _accuracy;
-            set { _accuracy = value; OnPropertyChanged(); }
+            return "Не удалось загрузить словарь.";
         }
 
-        public bool IsTestRunning
+        Random random = new Random();
+        List<string> testWords = new List<string>();
+
+        for (int i = 0; i < WORDS_COUNT; i++)
         {
-            get => _isTestRunning;
-            set { _isTestRunning = value; OnPropertyChanged(); }
+            int index = random.Next(_allAvailableWords.Count);
+            testWords.Add(_allAvailableWords[index]);
         }
 
-        public ICommand StartTestCommand { get; }
+        return string.Join(" ", testWords);
+    }
+    
+    private void InitializeTest()
+    {
+        LoadWordsFromFile(); 
+        TextToType = GenerateRandomText(); 
+        _wordsList = TextToType.Split(' ').ToList();
+        _wordIndex = 0;
+        CurrentWord = _wordsList[0];
 
-        private bool CanStartTest(object obj) => true; // Всегда можно начать/сбросить
+        _userInput = string.Empty;
+        RemainingTime = TEST_DURATION_SECONDS;
+        WPM = 0;
+        Accuracy = 100;
+        _totalCorrectCharsAccumulated = 0;
+        _totalErrors = 0;
+        _wordIndex = 0;
+        _isTestRunning = false;
 
-        private void StartTest(object obj = null)
+        OnPropertyChanged(nameof(UserInput));
+        OnPropertyChanged(nameof(IsTestRunning));
+    }
+    
+    private void CheckWord(string typedWord)
+    {
+        _totalCorrectCharsAccumulated += typedWord.Length;
+
+        _wordIndex++;
+        if (_wordIndex < _wordsList.Count)
+            CurrentWord = _wordsList[_wordIndex];
+        else
+            EndTest(true);
+    }
+
+    private void StartTimerOnly()
+    {
+        _isTestRunning = true;
+        _startTime = DateTime.Now;
+        _timer.Start();
+        OnPropertyChanged(nameof(IsTestRunning));
+    }
+    
+    private void StartTest(object obj = null)
+    {
+        if (IsTestRunning)
         {
-            if (IsTestRunning) return; 
-
-            // Загружаем актуальный словарь (укр/англ) из настроек
-            LoadWordsFromFile();
-            // Генерируем новый текст
+            EndTest(saveToStats: false);
+        }
+        else
+        {
             InitializeTest();
-
-            // СБРОС ВСЕХ НАКОПИТЕЛЕЙ
-            _totalCorrectCharsAccumulated = 0; 
-            _totalErrors = 0; // ОБЯЗАТЕЛЬНО ОБНУЛЯЕМ ОШИБКИ
-
-            IsTestRunning = true;
-            _startTime = DateTime.Now;
-            _timer.Start();
         }
+    }
 
-        private void Timer_Tick(object sender, EventArgs e)
+    private void Timer_Tick(object sender, EventArgs e)
+    {
+        RemainingTime--;
+        if (RemainingTime <= 0)
         {
-            RemainingTime--;
-
-            if (RemainingTime <= 0)
-            {
-                EndTest();
-            }
-            else
-            {
-                CalculateMetrics(); 
-            }
+            EndTest(saveToStats: true);
         }
-
-        private void EndTest()
+        else
         {
-            _timer.Stop();
-            IsTestRunning = false; // Сначала выключаем флаг
+            CalculateMetrics(); 
+        }
+    }
+    
+    private void EndTest(bool saveToStats = true)
+    {
+        _timer.Stop();
+        IsTestRunning = false;
 
-            // Сохраняем результат для передачи
+        if (saveToStats)
+        {
             var finalResult = new TestResult
             {
                 WPM = (int)this.WPM,
                 Accuracy = this.Accuracy,
                 TotalTime = TimeSpan.FromSeconds(60 - RemainingTime)
             };
-
-            // ОЧИСТКА: теперь ввод заблокирован, так как IsTestRunning = false
-            _currentWord = string.Empty;
-            _userInput = string.Empty;
-            _textToType = "Тест окончен.";
-    
-            // Уведомляем интерфейс
-            OnPropertyChanged(nameof(CurrentWord));
-            OnPropertyChanged(nameof(UserInput));
-            OnPropertyChanged(nameof(TextToType));
-
             StatisticsManager.UpdateBestStats(finalResult);
-    
-            System.Windows.MessageBox.Show($"Финиш!\nСкорость: {finalResult.WPM} WPM\nТочность: {finalResult.Accuracy}%");
+            System.Windows.MessageBox.Show($"Тест завершен!\nСкорость: {finalResult.WPM} WPM\nТочность: {finalResult.Accuracy}%");
         }
-
-        private void CalculateMetrics()
+        else
         {
-            TimeSpan timeElapsed = DateTime.Now - _startTime;
-            double minutesElapsed = timeElapsed.TotalMinutes;
-            if (minutesElapsed < 0.01) minutesElapsed = 0.01;
-
-            // Считаем общий объем ввода
-            int currentTypedChars = _userInput?.Length ?? 0;
-            int totalCharsTypedOverall = _totalCorrectCharsAccumulated + currentTypedChars;
-
-            // 1. Расчет WPM
-            WPM = Math.Round((totalCharsTypedOverall / 5.0) / minutesElapsed, 0);
-
-            // 2. Расчет ТОЧНОСТИ
-            if (totalCharsTypedOverall > 0)
-            {
-                // Формула: ((Всего нажатий - Ошибки) / Всего нажатий) * 100
-                double accuracyValue = ((double)(totalCharsTypedOverall - _totalErrors) / totalCharsTypedOverall) * 100;
-        
-                // Ограничиваем, чтобы не уходило в минус
-                Accuracy = Math.Round(Math.Max(0, accuracyValue), 2);
-            }
-            else
-            {
-                Accuracy = 100;
-            }
+            System.Windows.MessageBox.Show("Тест отменен. Статистика не сохранена.");
         }
 
-        // --- Реализация INotifyPropertyChanged ---
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        
+        _currentWord = string.Empty;
+        _userInput = string.Empty;
+        _textToType = "Тест окончен.";
     
+        OnPropertyChanged(nameof(CurrentWord));
+        OnPropertyChanged(nameof(UserInput));
+        OnPropertyChanged(nameof(TextToType));
+    }
+
+    private void CalculateMetrics()
+    {
+        if (!_isTestRunning) return;
+
+        double minutesElapsed = (DateTime.Now - _startTime).TotalMinutes;
+        if (minutesElapsed < 0.01) minutesElapsed = 0.01;
+
+        // totalCorrect = все буквы из прошлых слов + буквы в текущем поле
+        int totalCorrectOverall = _totalCorrectCharsAccumulated + (_userInput?.Length ?? 0);
+
+        WPM = Math.Round((totalCorrectOverall / 5.0) / minutesElapsed, 0);
+
+        // Точность: Правильные / (Правильные + Ошибки)
+        int totalTypedAttempts = totalCorrectOverall + _totalErrors;
+
+        if (totalTypedAttempts > 0)
+            Accuracy = Math.Round(((double)totalCorrectOverall / totalTypedAttempts) * 100, 2);
+        else
+            Accuracy = 100;
+    }
 }

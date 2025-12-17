@@ -19,9 +19,9 @@ public class ProfileViewModel:ObservableObject
 
     // Текстовые свойства для View
     public string UserDisplayName => CurrentUser?.Username ?? "Гость";
-    public string BestWPM => $"Лучшая скорость: {BestStats?.WPM ?? 0} СЛОВ/МИН";
-    public string BestAccuracy => $"Лучшая точность: {BestStats?.Accuracy.ToString("F2") ?? "0.00"} %";
-    public string TotalTests => $"Всего тестов пройдено: {StatisticsManager.GetTotalTestsCount()}";
+    public string BestWPM => $"Найкраща швидкість: {BestStats?.WPM ?? 0} СЛОВ/ХВ";
+    public string BestAccuracy => $"Найкраща точність: {BestStats?.Accuracy.ToString("F2") ?? "0.00"} %";
+    public string TotalTests => $"Всього тестів пройдено: {StatisticsManager.GetTotalTestsCount()}";
 
     public ICommand SelectPhotoCommand { get; }
     public ICommand LoadDataCommand { get; }
@@ -63,7 +63,7 @@ public class ProfileViewModel:ObservableObject
     private void ExecuteSelectPhoto()
     {
         if (string.IsNullOrEmpty(UserPhotoPath))
-            UserPhotoPath = "Resources/Images/default_avatar.png"; 
+            UserPhotoPath = "pack://application:,,,/Resources/Images/profileImages.png"; 
         else
             UserPhotoPath = null;
     }

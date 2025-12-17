@@ -11,17 +11,10 @@ public static class StatisticsManager
 
     private static TestResult _bestStats = new TestResult { WPM = 0, Accuracy = 0 };
     private static int _totalTests = 0;
-    private static string _currentLanguage = "ukr"; // По умолчанию украинский
 
     public static event Action OnStatisticsChanged;
 
     static StatisticsManager() { LoadFromFile(); }
-
-    public static string CurrentLanguage
-    {
-        get => _currentLanguage;
-        set { if (_currentLanguage != value) { _currentLanguage = value; SaveToFile(); } }
-    }
 
     public static TestResult GetBestStats() => _bestStats;
     public static int GetTotalTestsCount() => _totalTests;
@@ -29,6 +22,7 @@ public static class StatisticsManager
     public static void UpdateBestStats(TestResult newStats)
     {
         _totalTests++;
+        // Обновляем лучший результат, если текущий выше по WPM или при равенстве выше по точности
         if (newStats.WPM > _bestStats.WPM || (newStats.WPM == _bestStats.WPM && newStats.Accuracy > _bestStats.Accuracy))
         {
             _bestStats = newStats;
@@ -42,7 +36,14 @@ public static class StatisticsManager
         try
         {
             if (!Directory.Exists(FolderPath)) Directory.CreateDirectory(FolderPath);
-            var data = new { BestStats = _bestStats, TotalTests = _totalTests, CurrentLanguage = _currentLanguage };
+            
+            // Сохраняем ТОЛЬКО статистику
+            var data = new 
+            { 
+                BestStats = _bestStats, 
+                TotalTests = _totalTests 
+            };
+            
             File.WriteAllText(FilePath, JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
         } catch { }
     }
@@ -52,10 +53,17 @@ public static class StatisticsManager
         try
         {
             if (!File.Exists(FilePath)) return;
+            
             var data = JsonDocument.Parse(File.ReadAllText(FilePath)).RootElement;
-            if (data.TryGetProperty("BestStats", out var s)) _bestStats = JsonSerializer.Deserialize<TestResult>(s.GetRawText());
-            if (data.TryGetProperty("TotalTests", out var t)) _totalTests = t.GetInt32();
-            if (data.TryGetProperty("CurrentLanguage", out var l)) _currentLanguage = l.GetString();
-        } catch { }
+            
+            if (data.TryGetProperty("BestStats", out var s)) 
+                _bestStats = JsonSerializer.Deserialize<TestResult>(s.GetRawText());
+            
+            if (data.TryGetProperty("TotalTests", out var t)) 
+                _totalTests = t.GetInt32();
+        } catch { 
+            // Если файл поврежден, создаем чистый объект
+            _bestStats = new TestResult { WPM = 0, Accuracy = 0 };
+        }
     }
 }

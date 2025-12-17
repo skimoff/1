@@ -6,98 +6,132 @@
              xmlns:local="clr-namespace:TypingTest.MVVM.View"
              mc:Ignorable="d"
              d:DesignHeight="1000" d:DesignWidth="800">
-    <!--#000232-->
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Hidden">
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Margin="10,0,10,20">
+                
                 <Border Margin="10"
-                        Width="700"
+                        Width="720"
                         HorizontalAlignment="Left"
-                        CornerRadius="10"
+                        CornerRadius="15"
                         Background="#000232">
-                    <StackPanel Orientation="Vertical"
-                                Margin="10">
-                        <TextBlock Foreground="White"
-                                   FontSize="24"
+                    <StackPanel Orientation="Vertical" Margin="20">
+                        <TextBlock Foreground="#00FF00"
+                                   FontSize="26"
                                    TextWrapping="Wrap"
-                                   FontWeight="Bold">
-                            Golden Rule: Master Touch Typing
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10">
+                            Золоте правило: Сліпий набір
                         </TextBlock>
 
                         <TextBlock Foreground="White"
-                                   FontSize="20"
-                                   Margin="20 0 0 0"
+                                   FontSize="18"
+                                   LineHeight="24"
                                    TextWrapping="Wrap">
-                            Touch typing (ten-finger typing) is the only way to type quickly.
-                            It involves using all ten fingers without having to look at the keyboard.
-                            Instead, your fingers memorize the key locations.
+                            Сліпий набір (десятипальцевий метод) — це єдиний шлях до справжньої швидкості. 
+                            Ви повинні використовувати всі десять пальців, не дивлячись на клавіатуру. 
+                            Ваші пальці мають запам'ятати розташування клавіш на рівні рефлексів.
                         </TextBlock>
 
                         <TextBlock Foreground="White"
-                                   FontSize="20"
-                                   Margin="20 0 0 0"
+                                   FontSize="18"
+                                   Margin="0,15,0,0"
+                                   TextWrapping="Wrap"
+                                   FontStyle="Italic">
+                            Основний ряд: Ваші пальці завжди повинні повертатися до клавіш "ASDF" та "JKL;". 
+                            На клавішах "F" та "J" є спеціальні виступи, щоб ви могли зорієнтуватися на дотик.
+                        </TextBlock>
+
+                        <TextBlock Foreground="White"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Margin="0,20,0,10">
+                            Правильне положення:
+                        </TextBlock>
+
+                        <TextBlock Foreground="White"
+                                   FontSize="18"
+                                   LineHeight="24"
                                    TextWrapping="Wrap">
-                            Home Row Keys: Your fingers should always return to the "home row"—the
-                            ASDF JKL keys. These keys have small bumps for tactile orientation.
-                        </TextBlock>
-
-                        <TextBlock Foreground="White"
-                                   FontSize="24"
-                                   FontWeight="Bold">
-                            Correct fastening:
-                        </TextBlock>
-
-                        <TextBlock Foreground="White"
-                                   FontSize="20"
-                                   Margin="20 0 0 0"
-                                   TextWrapping="Wrap">
-                            Left hand: Four fingers (excluding the thumb) rest on the ASDF key.
-                            Right hand: Four fingers (excluding the thumb) rest on the JKL; key.
-                            Thumbs: Control only the SPACEBAR.
+                            • Ліва рука: чотири пальці лежать на клавішах ASDF.<LineBreak/>
+                            • Права рука: чотири пальці лежать на клавішах JKL;.<LineBreak/>
+                            • Великі пальці: відповідають виключно за ПРОБІЛ.
                         </TextBlock>
                     </StackPanel>
                 </Border>
 
                 <Border Margin="10"
-                        Width="700"
-
+                        Width="720"
                         HorizontalAlignment="Right"
-                        CornerRadius="10"
+                        CornerRadius="15"
                         Background="#000232">
-                    <StackPanel Orientation="Vertical"
-                                Margin="10">
+                    <StackPanel Orientation="Vertical" Margin="20">
+                        <TextBlock Foreground="#FFD700"
+                                   FontSize="26"
+                                   TextWrapping="Wrap"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10">
+                            Особливості керування
+                        </TextBlock>
+                        
+                        <TextBlock Foreground="White"
+                                   FontSize="18"
+                                   LineHeight="26"
+                                   TextWrapping="Wrap">
+                            У цьому тренажері діють особливі правила для максимальної ефективності:
+                        </TextBlock>
+
+                        <TextBlock Foreground="White"
+                                   FontSize="18"
+                                   Margin="10,10,0,0"
+                                   TextWrapping="Wrap">
+                            ❌ <Span FontWeight="Bold" Foreground="#FF4444">Клавіша Backspace вимкнена.</Span> Ви не можете стирати символи. Якщо ви помилилися, лінія під літерою стане червоною, а символ не з'явиться. Просто натисніть правильну літеру.<LineBreak/><LineBreak/>
+                            ✅ <Span FontWeight="Bold" Foreground="#4444FF">Пробіл — це підтвердження.</Span> Він спрацює лише тоді, коли слово набрано повністю і без жодної помилки.
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="10"
+                        Width="720"
+                        HorizontalAlignment="Left"
+                        CornerRadius="15"
+                        Background="#000232">
+                    <StackPanel Orientation="Vertical" Margin="20">
                         <TextBlock Foreground="White"
                                    FontSize="24"
                                    TextWrapping="Wrap"
-                                   FontWeight="Bold">
-                            Tips for speed and accuracy
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10">
+                            Поради щодо швидкості та точності
                         </TextBlock>
+                        
                         <TextBlock Foreground="White"
-                                   FontSize="20"
-                                   Margin="20 0 0 0"
+                                   FontSize="18"
+                                   LineHeight="26"
                                    TextWrapping="Wrap">
-                            At the initial stage, always prioritize accuracy.
-                            If you make a lot of mistakes, you'll have to spend time correcting them,
-                            which will negate the speed gains.<LineBreak />
-                            Start slow: For the first week, focus solely on typing correctly with the right finger, without looking at the keyboard.
-                            <LineBreak />
-                            Don't rush: Consciously slow down if you feel like you're about to make a mistake.
-                            <LineBreak />
-                            Establish Correct Posture<LineBreak />
-                            Proper posture reduces fatigue and increases efficiency:
-                            Back: Straight, pressed against the back of the chair.<LineBreak />
-                            Elbows: Bend at a 90-degree angle.<LineBreak />
-                            Wrists: Relaxed and not resting on the desk or the edge of the laptop.
-                            Keep them off the table or use a soft rest to keep them straight.<LineBreak />
-                            Distance to screen: 45-70 cm, center of screen at eye level.<LineBreak />
-                            Forget about looking at the keyboard<LineBreak />
-                            If you catch yourself looking down, stop.
-                            Even a quick glance disrupts your rhythm and wastes precious milliseconds. 
-                            Practice is the only way your brain and fingers will "automate" this skill.
+                            • <Span FontWeight="Bold">Точність понад усе:</Span> На початковому етапі швидкість не важлива. Якщо ви часто помиляєтесь, мозок запам'ятовує неправильні рухи.<LineBreak/>
+                            • <Span FontWeight="Bold">Не поспішайте:</Span> Свідомо сповільнюйтесь, якщо відчуваєте, що ось-ось зробите помилку.<LineBreak/>
+                            • <Span FontWeight="Bold">Забудьте про погляд вниз:</Span> Навіть швидкий погляд на клавіші руйнує ваш ритм і сповільнює прогрес.
                         </TextBlock>
 
+                        <TextBlock Foreground="White"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Margin="0,20,0,10">
+                            Правильна постава:
+                        </TextBlock>
+
+                        <TextBlock Foreground="White"
+                                   FontSize="18"
+                                   LineHeight="26"
+                                   TextWrapping="Wrap">
+                            • Спина: пряма, притиснута до спинки стільця.<LineBreak/>
+                            • Лікті: зігнуті під кутом 90 градусів.<LineBreak/>
+                            • Відстань до екрана: 45–70 см, центр екрана на рівні очей.
+                        </TextBlock>
                     </StackPanel>
                 </Border>
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>

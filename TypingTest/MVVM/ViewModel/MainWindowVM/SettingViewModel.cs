@@ -2,32 +2,66 @@
 
 namespace TypingTest.MVVM.ViewModel.MainWindowVM;
 
-public class SettingViewModel:ObservableObject
+public class SettingViewModel : ObservableObject
 {
+    // Свойства для ЯЗЫКА
     public bool IsUkrSelected
     {
-        get => StatisticsManager.CurrentLanguage == "ukr";
-        set 
-        { 
-            if (value) 
+        get => SettingsManager.Language == "ukr";
+        set
+        {
+            if (value)
             {
-                StatisticsManager.CurrentLanguage = "ukr"; 
+                SettingsManager.Language = "ukr";
+                SettingsManager.Save();
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsEngSelected)); // Уведомляем вторую кнопку
+                OnPropertyChanged(nameof(IsEngSelected));
             }
         }
     }
 
     public bool IsEngSelected
     {
-        get => StatisticsManager.CurrentLanguage == "eng";
-        set 
-        { 
-            if (value) 
+        get => SettingsManager.Language == "eng";
+        set
+        {
+            if (value)
             {
-                StatisticsManager.CurrentLanguage = "eng"; 
+                SettingsManager.Language = "eng";
+                SettingsManager.Save();
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsUkrSelected)); // Уведомляем вторую кнопку
+                OnPropertyChanged(nameof(IsUkrSelected));
+            }
+        }    
+    }
+
+    // Свойства для ТЕМЫ
+    public bool IsDarkTheme
+    {
+        get => SettingsManager.Theme == "Dark";
+        set
+        {
+            if (value)
+            {
+                SettingsManager.Theme = "Dark";
+                SettingsManager.Save();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLightTheme));
+            }
+        }
+    }
+
+    public bool IsLightTheme
+    {
+        get => SettingsManager.Theme == "Light";
+        set
+        {
+            if (value)
+            {
+                SettingsManager.Theme = "Light";
+                SettingsManager.Save();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsDarkTheme));
             }
         }
     }

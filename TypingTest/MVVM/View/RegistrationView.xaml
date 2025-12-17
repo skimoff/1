@@ -15,7 +15,7 @@
         <StackPanel Margin="100 75 100 75">
                 <TextBlock Text="Create your account"
                            Margin="0 0 0 15"
-                           Style="{StaticResource TextBlockStyle}"/>
+                           Style="{DynamicResource TextBlockStyle}"/>
                 <TextBlock Text="Login"
                            Foreground="#F2F2F2"
                            FontSize="14"/>

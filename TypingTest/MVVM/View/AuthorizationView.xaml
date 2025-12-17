@@ -31,7 +31,7 @@
         </DataTemplate>
     </Window.Resources>
     
-    <Border Style="{StaticResource MainWindowBorderStyle}"
+    <Border Style="{DynamicResource MainWindowBorderStyle}"
             CornerRadius="10">
         
         <Grid ShowGridLines="False">
@@ -60,7 +60,7 @@
                 <Button Grid.Column="3" 
                         Height="20"
                         Width="20"
-                        Style="{StaticResource ExitButton}"
+                        Style="{DynamicResource ExitButton}"
                         Click="Button_Quit"
                         Content="x"/>
             </Grid>

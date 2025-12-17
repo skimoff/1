@@ -16,58 +16,72 @@
     <UserControl.DataContext>
         <mainWindowVm:TestViewModel/>
     </UserControl.DataContext>
+    
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <RowDefinition Height="*"/>    <RowDefinition Height="Auto"/> </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock Foreground="White" Text="Время: " FontSize="18"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,30" HorizontalAlignment="Center">
+            <TextBlock Foreground="White" Text="Час: " FontSize="18"/>
             <TextBlock Foreground="White" Text="{Binding TimeDisplay}" FontWeight="Bold" FontSize="18" Width="60"/>
             
             <TextBlock Foreground="White" Text=" | " FontSize="18" Margin="10,0"/>
-            <TextBlock Foreground="White" Text="Слов в минуту (WPM): " FontSize="18"/>
+            <TextBlock Foreground="White" Text="WPM: " FontSize="18"/>
             <TextBlock Foreground="White" Text="{Binding WPM, StringFormat={}{0:F0}}" FontWeight="Bold" FontSize="18" Width="50"/>
             
             <TextBlock Foreground="White" Text=" | " FontSize="18" Margin="10,0"/>
-            <TextBlock Foreground="White" Text="Точность: " FontSize="18"/>
+            <TextBlock Foreground="White" Text="Точність: " FontSize="18"/>
             <TextBlock Foreground="White" Text="{Binding Accuracy, StringFormat={}{0:F2}}" FontWeight="Bold" FontSize="18" Width="80"/>
         </StackPanel>
 
-        <GroupBox Header="Слово для набору" Grid.Row="1" Margin="0,0,0,10">
-            <TextBlock Text="{Binding CurrentWord}" 
-                       TextWrapping="Wrap" 
-                       FontSize="36" 
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Foreground="White"/>
+        <GroupBox Header="Тренажер" Grid.Row="1" Margin="0,0,0,20">
+            <Grid VerticalAlignment="Center">
+                <ItemsControl ItemsSource="{Binding CurrentWordChars}" HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="4,0">
+                                <TextBlock Text="{Binding CharValue}" 
+                                           FontSize="48" 
+                                           FontWeight="Bold"
+                                           Foreground="White" 
+                                           HorizontalAlignment="Center"
+                                           FontFamily="Consolas"/>
+                                <Border Height="5" Width="30" CornerRadius="2"
+                                        Background="{Binding UnderlineColor}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBox x:Name="InputBox" 
+                         Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}" 
+                         Opacity="0" 
+                         FontSize="48"
+                         CaretBrush="Transparent"
+                         BorderThickness="0"
+                         VerticalAlignment="Stretch" 
+                         HorizontalAlignment="Stretch"/>
+            </Grid>
         </GroupBox>
 
-        <GroupBox Header="Ваш ввод" Grid.Row="2" Margin="0,0,0,10">
-            <TextBox Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}" 
-                     TextWrapping="NoWrap"
-                     Foreground="Black"
-                     FontSize="36" 
-                     Height="60"
-                     Padding="5"
-             
-            />
-        </GroupBox>
-
-        <Button Grid.Row="3" Command="{Binding StartTestCommand}" 
-                Height="50" Width="200"
-                Background="#000232" Foreground="White">
+        <Button Grid.Row="2" Command="{Binding StartTestCommand}" 
+                Height="50" Width="220" HorizontalAlignment="Center">
             <Button.Style>
                 <Style TargetType="Button">
-                    <Setter Property="Content" Value="НАЧАТЬ ТЕСТ" />
+                    <Setter Property="Background" Value="#000232" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="Content" Value="ОБНОВИТЬ ТЕКСТ" /> 
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsTestRunning}" Value="True">
-                            <Setter Property="Content" Value="ЗАВЕРШИТЬ ТЕСТ" />
-                            <Setter Property="Background" Value="#CC0000" /> </DataTrigger>
+                            <Setter Property="Content" Value="ЗАКОНЧИТЬ ТЕСТ" />
+                            <Setter Property="Background" Value="#CC0000" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Button.Style>

@@ -4,29 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:TypingTest.MVVM.View"
+             xmlns:mainWindowVm="clr-namespace:TypingTest.MVVM.ViewModel.MainWindowVM"
+             d:DataContext="{d:DesignInstance mainWindowVm:SettingViewModel}"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
     <Border Margin="20"
             CornerRadius="10"
-            Style="{StaticResource UserControlsBorderStyle}">
+            Style="{DynamicResource UserControlsBorderStyle}">
         <StackPanel Orientation="Vertical"
                     Margin="20">
-            <TextBlock Text="Theme"
+            <TextBlock Text="Тема"
                      FontSize="20"
                      Foreground="#F2F2F2"/>
             <StackPanel Orientation="Horizontal">
                 <RadioButton Height="25"
                              Width="100"
                              Content="Dark"
-                             IsChecked="True"
-                             Style="{StaticResource SettingRadioButton}"/>
+                             IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
+                             Style="{DynamicResource SettingRadioButton}"/>
                 <RadioButton Height="25"
                              Width="100"
                              Content="Light"
-                             Style="{StaticResource SettingRadioButton}"/>
+                             IsChecked="{Binding IsLightTheme, Mode=TwoWay}"
+                             Style="{DynamicResource SettingRadioButton}"/>
             </StackPanel>
-            
-            <TextBlock Text="Language"
+                
+            <TextBlock Text="Мова"
                        FontSize="20"
                        Foreground="#F2F2F2"/>
             <StackPanel Orientation="Horizontal">
@@ -34,12 +37,12 @@
                              Width="100"
                              Content="UA"
                              IsChecked="{Binding IsUkrSelected, Mode=TwoWay}"
-                             Style="{StaticResource SettingRadioButton}"/>
+                             Style="{DynamicResource SettingRadioButton}"/>
                 <RadioButton Height="25"
                              Width="100"
                              Content="ENG"
                              IsChecked="{Binding IsEngSelected, Mode=TwoWay}"
-                             Style="{StaticResource SettingRadioButton}"/>
+                             Style="{DynamicResource SettingRadioButton}"/>
             </StackPanel>
         </StackPanel>
     </Border>

@@ -14,7 +14,6 @@
 
     <ItemGroup>
       <Folder Include="Resources\Fonts\" />
-      <Folder Include="Resources\Images\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,6 +34,15 @@
       <Content Include="Resources\Text\words_ukr.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Images\profileImage.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Images\profileImages.png" />
+      <Resource Include="Resources\Images\profileImages.png" />
     </ItemGroup>
 
 </Project>

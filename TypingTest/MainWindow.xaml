@@ -22,7 +22,7 @@
         <mainWindowVm:MainViewModel />
     </Window.DataContext>
 
-    <Border Style="{StaticResource MainWindowBorderStyle}">
+    <Border Style="{DynamicResource MainWindowBorderStyle}">
         <Grid ShowGridLines="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" />
@@ -33,36 +33,36 @@
             <StackPanel Orientation="Vertical"
                         Grid.Column="0">
                 <TextBlock Text="Typing test"
-                           Style="{StaticResource TextBlockStyle}"
+                           Style="{DynamicResource TextBlockStyle}"
                            Margin="0 25 10 25" />
 
                 <RadioButton Height="50"
                              Width="200"
-                             Style="{StaticResource MainWindowRadioButton}"
-                             Content="Profile"
+                             Style="{DynamicResource MainWindowRadioButton}"
+                             Content="Профіль"
                              IsChecked="True"
                              Command="{Binding ProfileViewCommand}" />
                 <RadioButton Height="50"
                              Width="200"
-                             Style="{StaticResource MainWindowRadioButton}"
-                             Content="Test"
+                             Style="{DynamicResource MainWindowRadioButton}"
+                             Content="Тест"
 
                              Command="{Binding TestViewCommand}" />
                 <RadioButton Height="50"
                              Width="200"
-                             Style="{StaticResource MainWindowRadioButton}"
-                             Content="Guide"
+                             Style="{DynamicResource MainWindowRadioButton}"
+                             Content="Гайд"
                              
                              Command="{Binding GuideViewCommand}" />
                 <RadioButton Height="50"
                              Width="200"
-                             Style="{StaticResource MainWindowRadioButton}"
-                             Content="Settings"
+                             Style="{DynamicResource MainWindowRadioButton}"
+                             Content="Налагодження"
                              Command="{Binding SettingViewCommand}" />
                 <Button Height="50"
                         Width="200"
-                        Content="Quit"
-                        Style="{StaticResource ButtonStyle}"
+                        Content="Вихід"
+                        Style="{DynamicResource ButtonStyle}"
                         Click="Button_Quit_Click" />
             </StackPanel>
             <ContentControl Grid.Column="1"
