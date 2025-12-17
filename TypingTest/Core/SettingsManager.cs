@@ -8,6 +8,7 @@ public class SettingsManager
 {
    private static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TypingTest");
     private static readonly string FilePath = Path.Combine(FolderPath, "settings.json");
+    public static string UserName { get; set; }
 
     public static string Language { get; set; } = "ukr";
     public static string Theme { get; set; } = "Dark"; // "Dark" или "Light"
@@ -21,24 +22,36 @@ public class SettingsManager
     {
         try
         {
-            if (!Directory.Exists(FolderPath)) Directory.CreateDirectory(FolderPath);
-            
-            var data = new { Language, Theme };
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(data));
-            
-            ApplyTheme(); // Мгновенно обновляем цвета в окнах
+            // ВАЖНО: Если папки "TypingTest" в AppData нет, создаем её
+            if (!Directory.Exists(FolderPath))
+            {
+                Directory.CreateDirectory(FolderPath);
+            }
+
+            var settings = new
+            {
+                Language = Language,
+                Theme = Theme,
+                UserName = UserName 
+            };
+
+            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(FilePath, json);
+        
+            // Для отладки (можно потом удалить)
+            System.Diagnostics.Debug.WriteLine($"Файл сохранен по пути: {FilePath}");
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("Ошибка сохранения настроек: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine($"ОШИБКА СОХРАНЕНИЯ: {ex.Message}");
         }
     }
 
-    private static void Load()
+    public static void Load()
     {
         if (!File.Exists(FilePath))
         {
-            ApplyTheme(); 
+            ApplyTheme();
             return;
         }
 
@@ -46,8 +59,18 @@ public class SettingsManager
         {
             var json = File.ReadAllText(FilePath);
             using var doc = JsonDocument.Parse(json);
+            
+            // Читаем старые свойства
             Language = doc.RootElement.GetProperty("Language").GetString() ?? "ukr";
             Theme = doc.RootElement.GetProperty("Theme").GetString() ?? "Dark";
+            
+            // Читаем НОВОЕ свойство (имя). 
+            // TryGetProperty нужен, чтобы программа не вылетала, если файла еще нет или там нет этого поля
+            if (doc.RootElement.TryGetProperty("UserName", out var nameProp))
+            {
+                UserName = nameProp.GetString();
+            }
+
             ApplyTheme();
         }
         catch 
@@ -58,27 +81,34 @@ public class SettingsManager
 
     public static void ApplyTheme()
     {
-        string themeFile = Theme == "Light" ? "LigthStyle.xaml" : "DarkStyle.xaml";
-    
-        // Формат: /НазваниеСборки;component/ПутьОтКорняПроекта
-        // Замени "TypingTest" на точное название твоего проекта (Assembly Name)
-        var uri = new Uri($"/TypingTest;component/Resources/Styles/{themeFile}", UriKind.RelativeOrAbsolute);
+        string themeFile = Theme == "Light" ? "LightStyle.xaml" : "DarkStyle.xaml";
 
         try
         {
-            ResourceDictionary resDict = Application.LoadComponent(uri) as ResourceDictionary;
+            var dictionaries = Application.Current.Resources.MergedDictionaries;
         
-            if (resDict != null)
+            // Очищаем старые словари
+            dictionaries.Clear(); 
+
+            var uri = new Uri($"/TypingTest;component/Resources/Styles/{themeFile}", UriKind.RelativeOrAbsolute);
+        
+            // Загружаем новый словарь
+            if (Application.LoadComponent(uri) is ResourceDictionary resDict)
             {
-                Application.Current.Resources.MergedDictionaries.Clear();
-                Application.Current.Resources.MergedDictionaries.Add(resDict);
+                dictionaries.Add(resDict);
             }
+
+            // ВАЖНО: Если у тебя открыто несколько окон, иногда нужно явно сказать UI обновиться
+            foreach (Window window in Application.Current.Windows)
+            {
+                window.InvalidateVisual();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Тема успешно изменена на: {themeFile}");
         }
         catch (Exception ex)
         {
-            // Если что-то пошло не так, выводим ошибку в консоль дебага
-            System.Diagnostics.Debug.WriteLine($"КРИТИЧЕСКАЯ ОШИБКА ТЕМЫ: {ex.Message}");
-            // Не даем приложению упасть молча
+            System.Diagnostics.Debug.WriteLine($"ОШИБКА ЗАГРУЗКИ ТЕМЫ: {ex.Message}");
         }
     }
 }

@@ -9,7 +9,7 @@
              d:DataContext="{d:DesignInstance mainWindowVm:ProfileViewModel}"
              d:DesignHeight="600"
              d:DesignWidth="800">
-<Grid>
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" />
             <ColumnDefinition />
@@ -32,38 +32,11 @@
                     <Image Margin="10"
                            Source="{Binding UserPhotoPath}"
                            Stretch="UniformToFill">
-                        <Image.Style>
-                            <Style TargetType="Image">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding UserPhotoPath}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Image.Style>
                     </Image>
-
-                    <Button Content="Добавить фото"
-                            Command="{Binding SelectPhotoCommand}"
-                            Background="#000232"
-                            Foreground="White"
-                            Margin="10">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding UserPhotoPath}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
                 </Grid>
 
                 <TextBlock Grid.Row="1"
-                           Text="{Binding UserDisplayName}"  
+                           Text="{Binding UserDisplayName}"
                            Foreground="White"
                            Margin="10 0 0 10"
                            FontSize="16"
@@ -78,30 +51,30 @@
                 CornerRadius="10"
                 Background="#000232"
                 VerticalAlignment="Top">
-            
+
             <StackPanel Orientation="Vertical">
-                
-                <TextBlock Text="Найкраща статистика" 
+
+                <TextBlock Text="Найкраща статистика"
                            Foreground="White"
                            Margin="10 10 0 10"
                            FontSize="18"
                            FontWeight="Bold" />
-                
-                <TextBlock Text="{Binding BestWPM}" 
+
+                <TextBlock Text="{Binding BestWPM}"
                            Foreground="White"
                            Margin="10 5 0 0"
                            FontSize="16" />
-                
-                <TextBlock Text="{Binding BestAccuracy}" 
+
+                <TextBlock Text="{Binding BestAccuracy}"
                            Foreground="White"
                            Margin="10 5 0 0"
                            FontSize="16" />
-                
-                <TextBlock Text="{Binding TotalTests}" 
+
+                <TextBlock Text="{Binding TotalTests}"
                            Foreground="White"
                            Margin="10 5 0 0"
                            FontSize="16" />
-                
+
             </StackPanel>
         </Border>
     </Grid>

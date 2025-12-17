@@ -43,6 +43,7 @@
     <ItemGroup>
       <None Remove="Resources\Images\profileImages.png" />
       <Resource Include="Resources\Images\profileImages.png" />
+      <Page Remove="Resources\Styles\MainStyle.xaml" />
     </ItemGroup>
 
 </Project>

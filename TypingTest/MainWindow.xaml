@@ -21,52 +21,88 @@
     <Window.DataContext>
         <mainWindowVm:MainViewModel />
     </Window.DataContext>
-
-    <Border Style="{DynamicResource MainWindowBorderStyle}">
-        <Grid ShowGridLines="False">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-
-            <StackPanel Orientation="Vertical"
-                        Grid.Column="0">
-                <TextBlock Text="Typing test"
-                           Style="{DynamicResource TextBlockStyle}"
-                           Margin="0 25 10 25" />
-
-                <RadioButton Height="50"
-                             Width="200"
-                             Style="{DynamicResource MainWindowRadioButton}"
-                             Content="Профіль"
-                             IsChecked="True"
-                             Command="{Binding ProfileViewCommand}" />
-                <RadioButton Height="50"
-                             Width="200"
-                             Style="{DynamicResource MainWindowRadioButton}"
-                             Content="Тест"
-
-                             Command="{Binding TestViewCommand}" />
-                <RadioButton Height="50"
-                             Width="200"
-                             Style="{DynamicResource MainWindowRadioButton}"
-                             Content="Гайд"
-                             
-                             Command="{Binding GuideViewCommand}" />
-                <RadioButton Height="50"
-                             Width="200"
-                             Style="{DynamicResource MainWindowRadioButton}"
-                             Content="Налагодження"
-                             Command="{Binding SettingViewCommand}" />
-                <Button Height="50"
-                        Width="200"
-                        Content="Вихід"
-                        Style="{DynamicResource ButtonStyle}"
-                        Click="Button_Quit_Click" />
-            </StackPanel>
-            <ContentControl Grid.Column="1"
-                            Content="{Binding CurrentView}" />
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid x:Name="MainContent">
+            <Grid.Effect>
+                <BlurEffect Radius="{Binding BlurRadius}"/>
+            </Grid.Effect>
+            <ContentControl Content="{Binding CurrentView}"/> 
         </Grid>
-    </Border>
+
+        <Border Style="{DynamicResource MainWindowBorderStyle}">
+            <Grid ShowGridLines="False">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical" Grid.Column="0">
+                    <TextBlock Text="Typing test"
+                               Style="{DynamicResource TextBlockStyle}"
+                               Margin="0 25 10 25" />
+
+                    <RadioButton Height="50"
+                                 Width="200"
+                                 Style="{DynamicResource MainWindowRadioButton}"
+                                 Content="Профіль"
+                                 IsChecked="True"
+                                 Command="{Binding ProfileViewCommand}" />
+                    <RadioButton Height="50"
+                                 Width="200"
+                                 Style="{DynamicResource MainWindowRadioButton}"
+                                 Content="Тест"
+                                 Command="{Binding TestViewCommand}" />
+                    <RadioButton Height="50"
+                                 Width="200"
+                                 Style="{DynamicResource MainWindowRadioButton}"
+                                 Content="Гайд"
+                                 Command="{Binding GuideViewCommand}" />
+                    <RadioButton Height="50"
+                                 Width="200"
+                                 Style="{DynamicResource MainWindowRadioButton}"
+                                 Content="Налагодження"
+                                 Command="{Binding SettingViewCommand}" />
+                    <Button Height="50"
+                            Width="200"
+                            Content="Вихід"
+                            Style="{DynamicResource ButtonStyle}"
+                            Click="Button_Quit_Click" />
+                </StackPanel>
+                
+                <ContentControl Grid.Column="1"
+                                Content="{Binding CurrentView}" />
+            </Grid>
+        </Border>
+        
+        <Grid Background="#80000000" 
+              Visibility="{Binding IsRegistrationVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            
+            <Border Background="#000232" 
+                    Width="450" Height="280" 
+                    CornerRadius="20" 
+                    BorderBrush="#00FF00" BorderThickness="2"
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center">
+                
+                <StackPanel Margin="30">
+                    <TextBlock Text="Привіт!" Foreground="White" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Введіть ваше ім'я для старту:" Foreground="LightGray" Margin="0,10,0,20" HorizontalAlignment="Center"/>
+                    
+                    <TextBox Text="{Binding NewUserName, UpdateSourceTrigger=PropertyChanged}" 
+                             FontSize="20" Padding="8" Height="45"
+                             Background="#1A1A1A" Foreground="White" BorderBrush="Gray"/>
+                    
+                    <Button Content="ПОЇХАЛИ!" 
+                            Command="{Binding SaveNameCommand}"
+                            Margin="0,25,0,0" Height="50" 
+                            Background="#00FF00" Foreground="Black" FontWeight="Bold" FontSize="18"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+    </Grid>
 </Window>

@@ -23,12 +23,12 @@ public class ProfileViewModel:ObservableObject
     public string BestAccuracy => $"Найкраща точність: {BestStats?.Accuracy.ToString("F2") ?? "0.00"} %";
     public string TotalTests => $"Всього тестів пройдено: {StatisticsManager.GetTotalTestsCount()}";
 
-    public ICommand SelectPhotoCommand { get; }
+    
     public ICommand LoadDataCommand { get; }
 
     public ProfileViewModel()
     {
-        SelectPhotoCommand = new RelayCommand(param => ExecuteSelectPhoto());
+        
         LoadDataCommand = new RelayCommand(param => LoadData());
 
         // Подписываемся на обновление статистики
@@ -39,16 +39,27 @@ public class ProfileViewModel:ObservableObject
 
     public void LoadData()
     {
-        // Инициализируем юзера, если его нет
+        UserPhotoPath = "pack://application:,,,/Resources/Images/profileImages.png";
+        SettingsManager.Load();
+
+        // 2. Инициализируем юзера данными из настроек
         if (CurrentUser == null) 
         {
-            CurrentUser = new UserModel { Username = "Skimoff" }; 
+            CurrentUser = new UserModel(); 
         }
 
-        // Берем свежие данные из менеджера (который загрузил их из JSON)
+        // Заменяем "Skimoff" на имя из настроек. Если пусто — пишем "Гість"
+        CurrentUser.Username = !string.IsNullOrEmpty(SettingsManager.UserName) 
+            ? SettingsManager.UserName 
+            : "Гість";
+
+        // Уведомляем интерфейс, что имя изменилось
+        OnPropertyChanged(nameof(UserDisplayName));
+
+        // 3. Берем свежие статы
         BestStats = StatisticsManager.GetBestStats(); 
-        
-        // ПРИНУДИТЕЛЬНО уведомляем UI, что количество тестов могло измениться
+    
+        // ПРИНУДИТЕЛЬНО уведомляем UI об изменениях
         OnPropertyChanged(nameof(TotalTests));
         OnPropertyChanged(nameof(BestWPM));
         OnPropertyChanged(nameof(BestAccuracy));
@@ -59,12 +70,5 @@ public class ProfileViewModel:ObservableObject
         // Вызывается автоматически, когда StatisticsManager сохраняет новый результат
         LoadData(); 
     }
-
-    private void ExecuteSelectPhoto()
-    {
-        if (string.IsNullOrEmpty(UserPhotoPath))
-            UserPhotoPath = "pack://application:,,,/Resources/Images/profileImages.png"; 
-        else
-            UserPhotoPath = null;
-    }
+    
 }

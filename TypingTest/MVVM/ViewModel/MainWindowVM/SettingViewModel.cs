@@ -44,6 +44,7 @@ public class SettingViewModel : ObservableObject
             if (value)
             {
                 SettingsManager.Theme = "Dark";
+                SettingsManager.ApplyTheme(); // ДОБАВЬ ЭТУ СТРОКУ
                 SettingsManager.Save();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsLightTheme));
@@ -56,9 +57,10 @@ public class SettingViewModel : ObservableObject
         get => SettingsManager.Theme == "Light";
         set
         {
-            if (value)
+            if (value)  
             {
                 SettingsManager.Theme = "Light";
+                SettingsManager.ApplyTheme(); // ДОБАВЬ ЭТУ СТРОКУ
                 SettingsManager.Save();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsDarkTheme));
